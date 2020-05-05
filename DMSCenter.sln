@@ -18,6 +18,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DMSCenter.Win", "DMSCenter.
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DMSCenter.WorkflowServerService", "DMSCenter.WorkflowServerService\DMSCenter.WorkflowServerService.vbproj", "{E207E891-940C-4386-AB67-1A64C8343C13}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "dmscenterapi", "dmscenterapi\dmscenterapi.vbproj", "{7100E739-4031-4630-BC18-73791E4012E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,11 +63,20 @@ Global
 		{E207E891-940C-4386-AB67-1A64C8343C13}.EasyTest|Any CPU.Build.0 = Release|Any CPU
 		{E207E891-940C-4386-AB67-1A64C8343C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E207E891-940C-4386-AB67-1A64C8343C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7100E739-4031-4630-BC18-73791E4012E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7100E739-4031-4630-BC18-73791E4012E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7100E739-4031-4630-BC18-73791E4012E0}.EasyTest|Any CPU.ActiveCfg = Release|Any CPU
+		{7100E739-4031-4630-BC18-73791E4012E0}.EasyTest|Any CPU.Build.0 = Release|Any CPU
+		{7100E739-4031-4630-BC18-73791E4012E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7100E739-4031-4630-BC18-73791E4012E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E985FF3C-E6E9-457F-ABF6-ED987D03BA09}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

@@ -141,7 +141,7 @@ Namespace DMSCenter
             Dim strDMSAdminPasswort As String = obj.FK_Kunde.DMSPassword
 
             Dim DMSClient As New DMSConnector(strDMSUser, strDMSPasswort, strDMS, strDMSAdminUser, strDMSAdminPasswort)
-            ' ArchiveProjects(obj,DMSClient)
+           
             ImportSorbaUser(obj)
             SetGroupMembershipProjekte(obj, DMSClient)
             SetGroupMembership(obj, DMSClient, "M_AQ", "Adressen")
@@ -231,8 +231,8 @@ Namespace DMSCenter
 
 
             dCollection.Filter = Nothing
-            Dim filter As CriteriaOperator = CriteriaOperator.Parse("MYSUSER <> '' AND M_PROJ == True ")
-            'Dim filter As CriteriaOperator = CriteriaOperator.Parse("MYSUSER <> '' AND M_PROJ == True AND  MY_PRJ == False AND PRJ_ACCESS == False")
+           ' Dim filter As CriteriaOperator = CriteriaOperator.Parse("MYSUSER <> '' AND M_PROJ == True ")
+            Dim filter As CriteriaOperator = CriteriaOperator.Parse("MYSUSER <> '' AND M_PROJ == True AND  MY_PRJ == False AND PRJ_ACCESS == False")
             dCollection.Filter = filter
 
             Dim strGroupID As String
@@ -260,25 +260,35 @@ Namespace DMSCenter
 
 
             'Alle Benutzer mit EigeneProjekte-Filter
-            '  filter = CriteriaOperator.Parse(" MYSUSER <> '' AND M_PROJ == True AND ( MY_PRJ == True OR PRJ_ACCESS == True)")
-            '  dCollection.Filter = filter
+              filter = CriteriaOperator.Parse(" MYSUSER <> '' AND M_PROJ == True AND ( MY_PRJ == True OR PRJ_ACCESS == True)")
+              dCollection.Filter = filter
 
-            'Dim strGroupIDFilter As String = DMSCLient.GetGroupId(RemoveDiacritics(obj.Name) & "_Projekte_Filter")
+            Dim strGroupIDFilter As String = DMSCLient.GetGroupId(RemoveDiacritics(obj.Name) & "_Projekte_Filter")
 
-            ' Dim listNames1 As List(Of GetMembersForGroupMember) = DMSCLient.GetGroupMembers(strGroupIDFilter)
+            Dim listNames1 As List(Of GetMembersForGroupMember) = DMSCLient.GetGroupMembers(strGroupIDFilter)
 
-            ' For Each lobj1 In listNames1
-            '     DMSCLient.DeleteGroupMembers(strGroupIDFilter, lobj1.Name)
-            ' Next
-
-
+            For Each lobj1 In listNames1
+                 DMSCLient.DeleteGroupMembers(strGroupIDFilter, lobj1.Name)
+            Next
 
 
 
-            If dCollection.Count > 9999999999 Then
-                ImportData(obj, "DMS_PROJEKTE", "P", "&sOption=1")
+
+
+            If dCollection.Count > 0 Then
+             ' ImportData(obj, "DMS_PROJEKTE", "P", "")
+              ImportData(obj, "DMS_PROJEKTE", "P", "&sOption=1")
 
                 Dim projCollection As XPCollection(Of DatenObjekt) = obj.DatenObjekts
+                  strGroupId = DMSClient.GetGroupId(RemoveDiacritics(obj.Name) & "_Projekte_Filter")
+        
+            'Für alle Projekte die Gruppe Projekte_Filter hinzufügen
+           ' For Each oDO As DatenObjekt In projCollection
+           '     If oDO.ID <> "" Then
+           '     Dim strBaseFolderProj = "/sorbateamfolder/Sorba/" & obj.Name & "/Projekte/" & oDO.DValue
+           '            SetEigenFilter(strGroupId, oDO.DValue, strBaseFolderProj, DMSClient)
+           '      End If
+           '    Next
 
                 For Each pObj In dCollection
                     Dim strMySuser As String = pObj.MYSUSER.Replace("@", "").Replace(".", "")
@@ -286,8 +296,9 @@ Namespace DMSCenter
                     Dim strGroupIdS As String = DMSCLient.CreateGroup("EigenProjekte_" & RemoveDiacritics(obj.Name) & "_" & strMySuser)
                     If strGroupIdS.Length > 0 Then
                         DMSCLient.AddGroupMembers(strGroupIdS, strMySuser)
-                        '   DMSCLient.AddGroupMembers(strGroupIDFilter, strMySuser)
-
+                        'Gruppe "Projekte_Filter"
+                          DMSCLient.AddGroupMembers(strGroupId, strMySuser)
+                       
 
                         If pObj.MY_PRJ = True Then
                             'Filter auf die Projektetabelle und Feld PROJ_FILTER
@@ -307,7 +318,7 @@ Namespace DMSCenter
 
                         End If
 
-                        '  If pObj.PRJ_ACCESS = True then
+                        If pObj.PRJ_ACCESS = True then
                         'Filter auf die Projektetabelle und Feld PROJ_FILTER
                         projCollection.Filter = Nothing
                         Dim filtereigen2 As CriteriaOperator = CriteriaOperator.Parse("Type = 'P' AND DFilter like '%" & strMySuser & "@%'")
@@ -323,7 +334,7 @@ Namespace DMSCenter
 
                         projCollection.Filter = Nothing
 
-                        '    End If
+                      End If
 
 
 
@@ -412,6 +423,8 @@ Namespace DMSCenter
             TransferFilesSend(obj, "PERS", "Personal")
             TransferFilesSend(obj, "F", "Fibu")
 
+             ArchiveProjects(obj,DMSClient)
+
 
         End Function
 
@@ -441,9 +454,9 @@ Namespace DMSCenter
                 If oDO.ID <> "" Then
 
                     DMSClient.RenameFolder(oDO.ID, oDO.DValue, strBaseFolder)
-                    '  If strType = "P" Then
-                    '      SetEigenFilter(strGroupId, oDO.DValue, strBaseFolder, DMSClient)
-                    ' End If
+                      If strType = "P" Then
+                          SetEigenFilter(strGroupId, oDO.DValue, strBaseFolder, DMSClient)
+                     End If
 
                 End If
 
@@ -499,14 +512,7 @@ Namespace DMSCenter
 
 
         Public Function ImportProjects(ByVal obj As Domain) As Boolean
-            '  BaseConfiguration(obj)
-            '  ImportData(obj, "DMS_PROJEKTE", "P")
-            ImportData(obj, "DMS_ADRESSEN", "A")
-            ' ImportData(obj, "DMS_PERSONAL", "PERS")
-            ' ImportData(obj, "DMS_INVENTAR", "I")
-            ' ImportData(obj, "DMS_MATERIAL", "M")
-            ' ImportData(obj, "DMS_FIBU", "F")
-
+            BaseConfiguration(obj)
         End Function
 
         Public Shared Function RemoveDiacritics(ByVal s As String) As String

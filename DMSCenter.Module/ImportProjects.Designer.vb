@@ -54,7 +54,7 @@
         Me.SimpleAction1.Caption = "Benutzer autorisieren"
         Me.SimpleAction1.Category = "View"
         Me.SimpleAction1.ConfirmationMessage = Nothing
-        Me.SimpleAction1.Id = "866a6127-f601-44b9-af7e-f948ec3ec609"
+        Me.SimpleAction1.Id = "866a6127-f601-44b9-af7e-f948ec3e1609"
         Me.SimpleAction1.TargetObjectType = GetType(DMSCenter.Domain)
         Me.SimpleAction1.ToolTip = Nothing
         '

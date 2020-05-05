@@ -193,7 +193,7 @@ Namespace DMSCenter
 
 
             Dim model As New FileListModel
-            model.limit = 1000000
+            model.limit = 100000000
             model.path = strPath
             model.start = 0
 
