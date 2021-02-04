@@ -90,8 +90,59 @@ Namespace DMSCenter
                 Dim folder As New CreateFolderPostModel
                 folder.name = strFolder
                 folder.path = strFolderPath
-                Dim folderResponse = _userApi.CreateFolder(folder).Result
+                Try
+                      Dim folderResponse = _userApi.CreateFolder(folder).Result
+                Catch ex As Exception
+
+                End Try
+              
             End If
+
+            Return True
+        End Function
+
+
+         Function Between(value As String, a As String,
+                     b As String) As String
+            ' Get positions for both string arguments.
+            Dim posA As Integer = value.IndexOf(a)
+            Dim posB As Integer = value.LastIndexOf(b)
+            If posA = -1 Then
+                Return ""
+            End If
+            If posB = -1 Then
+                Return ""
+            End If
+
+            Dim adjustedPosA As Integer = posA + a.Length
+            If adjustedPosA >= posB Then
+                Return ""
+            End If
+
+            ' Get the substring between the two positions.
+            Return value.Substring(adjustedPosA, posB - adjustedPosA)
+        End Function
+
+
+             Public Function CheckUser(ByVal strUser As String) As Boolean
+
+       
+                Dim user As New GetUserSessionsPostModel
+               user.username = strUser
+              
+                Try
+                      Dim folderResponse As GetUserInfoResponseModel = _adminApi.GetUser(user).Result
+                      Dim strUserRet As String = Between(folderResponse.ResponseResult, "<user>", "</user>") 
+                      If strUserRet.Length > 0 Then
+                      Return True
+                      Else
+                      Return False
+                      End If
+                Catch ex As Exception
+                Return False
+
+                End Try
+    
 
             Return True
         End Function
@@ -117,7 +168,7 @@ Namespace DMSCenter
         End Function
         Public Function RenameFolder(ByVal strFolder As String, ByVal strFolderNew As String, ByVal strFolderPath As String) As Boolean
             Try
-                '   Dim strFolder1 As String = "\\DMSFiler\DMS$\Transfer\368\Sorba\368" & strFolderPath & "\" & strFolder
+        
 
                 Dim folder As New RenameFileModel
                 folder.name = strFolder
@@ -185,6 +236,7 @@ Namespace DMSCenter
             group.groupid = strGroup
 
             Dim groupResponse As GetMembersForGroupResponseModel = _adminApi.GetMembersForGroup(group).Result
+         
             Return groupResponse.Data.GetMembersForGroupMember
 
         End Function
@@ -210,7 +262,14 @@ Namespace DMSCenter
             group.groupid = strGroup
             group.userid = strUserId
 
-            Dim groupResponse = _adminApi.AddMemberToGroup(group).Result
+            Try
+  Dim groupResponse = _adminApi.AddMemberToGroup(group).Result
+
+            Catch ex As Exception
+
+            End Try
+
+          
             Return True
 
         End Function
@@ -316,11 +375,16 @@ Namespace DMSCenter
             group.flag = strFlag '"allow"
             group.type = "group"
             group.value = strGroup
-
-            Dim groupResponse = _userApi.AddAclEntry(group).Result
+            Try
+                 Dim groupResponse = _userApi.AddAclEntry(group).Result
             If bdontInherit = True Then
                 Dim BaseResponse = _userApi.SetAclInheritance(strFolderPath, "0")
             End If
+
+            Catch ex As Exception
+
+            End Try
+           
             Return True
         End Function
 

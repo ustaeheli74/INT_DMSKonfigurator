@@ -35,6 +35,7 @@ Namespace DMSCenter
             Dim strDMSAdminPasswort As String = obj.DMSPassword
 
             Dim DMSClient As New DMSConnector(strDMSUser, strDMSPasswort, strDMS, strDMSAdminUser, strDMSAdminPasswort)
+   
             Dim resp As AddUserPostResponseModel = DMSClient.CreateUser(strUEmail.Replace("@", "").Replace(".", ""), strUPassword, strUEmail)
 
 
@@ -44,7 +45,7 @@ Namespace DMSCenter
 
         End Function
 
-        Public Function ActDeactUser(ByVal obj As Kunde, ByVal strUEmail As String, ByVal strPasswort As String, ByVal bAktivieren As Boolean) As String
+          Public Function CheckDMSUser(ByVal obj As Kunde, ByVal strUEmail As String, ByVal strUPassword As String) As Boolean
 
             Dim strDMS As String = obj.DMSAdresse
             Dim strDMSUser As String = obj.DMSUserTeamfolder
@@ -53,7 +54,23 @@ Namespace DMSCenter
             Dim strDMSAdminPasswort As String = obj.DMSPassword
 
             Dim DMSClient As New DMSConnector(strDMSUser, strDMSPasswort, strDMS, strDMSAdminUser, strDMSAdminPasswort)
+            Dim resp As Boolean = DMSClient.CheckUser(strUEmail.Replace("@", "").Replace(".", ""))
+
+            Return resp
+
+        End Function
+
+        Public Function ActDeactUser(ByVal obj As Kunde, ByVal strUEmail As String, ByVal strPasswort As String, ByVal bAktivieren As Boolean) As String
+    
+            Dim strDMS As String = obj.DMSAdresse
+            Dim strDMSUser As String = obj.DMSUserTeamfolder
+            Dim strDMSPasswort As String = obj.DMSPasswortTeamfolder
+            Dim strDMSAdminUser As String = obj.DMSUser
+            Dim strDMSAdminPasswort As String = obj.DMSPassword
+
+            Dim DMSClient As New DMSConnector(strDMSUser, strDMSPasswort, strDMS, strDMSAdminUser, strDMSAdminPasswort)
             Dim resp As UpdateUserResponseModel = DMSClient.UpdateUser(strUEmail.Replace("@", "").Replace(".", ""), strUEmail, bAktivieren)
+            bAktivieren = False
             If bAktivieren = True Then
                 Dim resp1 As SetUserPasswordResponseModel = DMSClient.ChangeUserPW(strUEmail.Replace("@", "").Replace(".", ""), strPasswort)
             End If
@@ -72,14 +89,14 @@ Namespace DMSCenter
 
             If _SorbaCredentials.Length < 1 Then
 
-                Dim dt As DataTable = getSQLCredentials(strKdNr, strDomain)
-                If IsNothing(dt) = False Then
-                    If dt.Rows.Count > 0 Then
-                        Dim credentials As String = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(dt.Rows(0)("Username").ToString & ":" & dt.Rows(0)("Password").ToString))
-                        _SorbaCredentials = credentials
-                    End If
-                End If
-            End If
+               Dim dt As DataTable = getSQLCredentials(strKdNr, strDomain)
+               If IsNothing(dt) = False Then
+                   If dt.Rows.Count > 0 Then
+                       Dim credentials As String = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(dt.Rows(0)("Username").ToString & ":" & dt.Rows(0)("Password").ToString))
+                       _SorbaCredentials = credentials
+                   End If
+               End If
+           End If
             '
             If _SorbaCredentials.Length < 1 Then
                 _SorbaCredentials = "YWRtaW46ZWxp"
@@ -159,18 +176,25 @@ Namespace DMSCenter
 
             For Each item As Entry In listEntries
                 'item.Name
-
+             
+               
                 Try
 
+               Dim strFirst = Left(item.Name,1)
+               If  StrComp(strFirst, UCase(strFirst), vbBinaryCompare) = False Then
+                    obj.DatenObjekts.Filter = Nothing
                     Dim filter As CriteriaOperator = CriteriaOperator.Parse("[Type] = 'P' AND [DValue] ='" & item.Name & "'")
                     obj.DatenObjekts.Filter = filter
                     Dim dCollection As XPCollection(Of DatenObjekt) = obj.DatenObjekts
                     If dCollection.Count = 0 Then
-                        DMSCLient.RenameFolderArchiv(strBaseFolder & item.Name, strBaseFolderArchiv & item.Name)
+                   DMSCLient.RenameFolderArchiv(strBaseFolder & item.Name, strBaseFolderArchiv & item.Name)
+                             Dim strtest As String = item.Name
                     Else
                         Dim strtest As String = ""
 
                     End If
+                End If
+
 
                 Catch ex As Exception
 
@@ -202,12 +226,18 @@ Namespace DMSCenter
                 Dim listNames As List(Of GetMembersForGroupMember) = DMSCLient.GetGroupMembers(strGroupID)
 
                 For Each lobj In listNames
+                    If strGroupID.Length > 0 Then
                     DMSCLient.DeleteGroupMembers(strGroupID, lobj.Name)
+                    End If
                 Next
 
                 DMSCLient.AddGroupMembers(strGroupID, "teamfolder")
                 For Each dcObj As SorbaUsers In dCollection
-                    DMSCLient.AddGroupMembers(strGroupID, dcObj.MYSUSER.Replace("@", "").Replace(".", ""))
+
+                    Dim strUserName As String = dcObj.MYSUSER.Replace("@", "").Replace(".", "")
+                    strUserName = strUserName.ToLower
+
+                    DMSCLient.AddGroupMembers(strGroupID, strUserName)
                 Next
 
 
@@ -241,14 +271,16 @@ Namespace DMSCenter
 
             If strGroupID.Length > 0 Then
                 Dim listNames As List(Of GetMembersForGroupMember) = DMSCLient.GetGroupMembers(strGroupID)
-
+                If IsNothing(listNames) = False Then
                 For Each lobj In listNames
                     DMSCLient.DeleteGroupMembers(strGroupID, lobj.Name)
                 Next
+             End If
                 DMSCLient.AddGroupMembers(strGroupID, "teamfolder")
                 For Each dcObj As SorbaUsers In dCollection
 
                     Dim strUser As String = dcObj.MYSUSER.Replace("@", "").Replace(".", "")
+                    strUser = strUser.ToLower
 
                     DMSCLient.AddGroupMembers(strGroupID, strUser)
                 Next
@@ -266,10 +298,13 @@ Namespace DMSCenter
             Dim strGroupIDFilter As String = DMSCLient.GetGroupId(RemoveDiacritics(obj.Name) & "_Projekte_Filter")
 
             Dim listNames1 As List(Of GetMembersForGroupMember) = DMSCLient.GetGroupMembers(strGroupIDFilter)
-
+            If IsNothing(listNames1) = False Then
             For Each lobj1 In listNames1
+               If strGroupIDFilter.Length > 0 Then
                  DMSCLient.DeleteGroupMembers(strGroupIDFilter, lobj1.Name)
+               End If
             Next
+            End If
 
 
 
@@ -373,7 +408,7 @@ Namespace DMSCenter
                 Next
                 DMSCLient.AddGroupMembers(strGroupID, "teamfolder")
                 For Each dcObj As SorbaUsers In dCollection
-                    DMSCLient.AddGroupMembers(strGroupID, dcObj.MYSUSER.Replace("@", "").Replace(".", ""))
+                    DMSCLient.AddGroupMembers(strGroupID, dcObj.MYSUSER.Replace("@", "").Replace(".", "").ToLower)
                 Next
 
 
@@ -416,6 +451,14 @@ Namespace DMSCenter
             Dim DMSClient As New DMSConnector(strDMSUser, strDMSPasswort, strDMS, strDMSAdminUser, strDMSAdminPasswort)
             Dim strBase As String = "Sorba"
 
+            ImportData(obj, "DMS_PROJEKTE", "P", "")
+            ImportData(obj, "DMS_ADRESSEN", "A")
+            ImportData(obj, "DMS_PERSONAL", "PERS")
+            ImportData(obj, "DMS_INVENTAR", "I")
+            ImportData(obj, "DMS_MATERIAL", "M")
+            ImportData(obj, "DMS_FIBU", "F")
+
+
             TransferFilesSend(obj, "A", "Adressen")
             TransferFilesSend(obj, "P", "Projekte")
             TransferFilesSend(obj, "I", "Inventar")
@@ -423,7 +466,7 @@ Namespace DMSCenter
             TransferFilesSend(obj, "PERS", "Personal")
             TransferFilesSend(obj, "F", "Fibu")
 
-             ArchiveProjects(obj,DMSClient)
+           ' ArchiveProjects(obj,DMSClient)
 
 
         End Function
@@ -445,15 +488,30 @@ Namespace DMSCenter
 
             ' Dim strBaseFolder = "\" & strBaseFolderName
             Dim strBaseFolder = "/sorbateamfolder/Sorba/" & obj.Name & "/" & strBaseFolderName
-
+           ' strBaseFolder = "/sorbateamfolder/Sorba/Center/Kopp/Adressen"
             If strType = "P" Then
                 strGroupId = DMSClient.GetGroupId(RemoveDiacritics(obj.Name) & "_Projekte_Filter")
             End If
 
             For Each oDO As DatenObjekt In dCollection
                 If oDO.ID <> "" Then
+                
+                If strType = "P" Then
+                Dim strOriginalPfad As String = ""
+                strOriginalPfad = oDO.Path.Remove(oDO.Path.Length-1,1)
+                strOriginalPfad = strOriginalPfad.Replace("\\","\")
+                Dim parts As String() = strOriginalPfad.Split("\")
+                Dim strPfad As String = parts(parts.Length -1)
 
-                    DMSClient.RenameFolder(oDO.ID, oDO.DValue, strBaseFolder)
+                DMSClient.RenameFolder(oDO.ID, oDO.DValue, strBaseFolder)             
+              '  DMSClient.RenameFolder(strPfad, oDO.DValue, strBaseFolder)
+
+                 Else
+                DMSClient.RenameFolder(oDO.ID, oDO.DValue, strBaseFolder)
+                'DMSClient.CreateFolder(oDO.DValue,strBaseFolder)
+                   
+                 End If
+                 
                       If strType = "P" Then
                           SetEigenFilter(strGroupId, oDO.DValue, strBaseFolder, DMSClient)
                      End If
@@ -671,6 +729,7 @@ Namespace DMSCenter
 
 
         Public Function ImportSorbaUser(ByRef obj As Domain) As Boolean
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12
             Dim strSorbaWebservice As String = obj.FK_Kunde.SorbaWebservice
             Dim strDomain As String = obj.Name
             Dim strKdNr As String = obj.FK_Kunde.AdrNr

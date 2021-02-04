@@ -111,11 +111,19 @@ Namespace Controllers
                                 Dim objKunde As Kunde = session.FindObject(Of Kunde)(New BinaryOperator("AdrNr", req.KdNr))
                                 If IsNothing(objKunde) = False Then
 
+                                    Dim strStatusCode As String =   ""
+                                    Dim strMessage As String = ""
+
                                     Dim sConn As New SorbaConnector
+                                  If  sConn.CheckDMSUser(objkunde,req.Name.ToString,req.Password) = False Then
                                     Dim strReturn As String = sConn.CreateDMSUser(objKunde, req.Name, req.Password)
 
-                                    Dim strStatusCode As String = Between(strReturn, "<result>", "</result>")
-                                    Dim strMessage As String = Between(strReturn, "<message>", "</message>")
+                                    strStatusCode= Between(strReturn, "<result>", "</result>")
+                                    strMessage = Between(strReturn, "<message>", "</message>")
+                                    Else
+                                        strStatusCode = "0"
+                                        strMessage = "Username already exists and is not available"
+                                    End If
 
                                     If strStatusCode = "1" Then
                                         Return New standardResponse() With {.IsSuccess = True, .Result = strMessage}

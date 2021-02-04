@@ -4,7 +4,17 @@
     <Class Name="DMSCenter.Module.DMSCenter.DatenObjekt" ImageName="BO_Order" />
     <Class Name="DMSCenter.Module.DMSCenter.Domain" ImageName="BO_Organization" />
     <Class Name="DMSCenter.Module.DMSCenter.FilesnFolders" ImageName="BO_List" />
+    <Class Name="DMSCenter.Module.DMSCenter.Kunde" ImageName="BO_Department" />
   </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="@51833d0c-d146-4e12-baac-e90eb55bfc79" Caption="Kunden" ImageName="BO_Employee" ViewId="Kunde_ListView" IsNewNode="True">
+        <Items IsNewNode="True">
+          <Item Id="@9ae4e952-1961-4489-a1dc-2ae156c64808" ViewId="Kunde_ListView" Caption="Kundenliste" IsNewNode="True" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
   <Options>
     <LayoutManagerOptions RequiredFieldMark="*" />
   </Options>

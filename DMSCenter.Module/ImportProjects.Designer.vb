@@ -33,7 +33,7 @@
         '
         'ImportProjectAction
         '
-        Me.ImportProjectAction.Caption = "Import Projekte"
+        Me.ImportProjectAction.Caption = "Grundstruktur erstellen"
         Me.ImportProjectAction.Category = "View"
         Me.ImportProjectAction.ConfirmationMessage = Nothing
         Me.ImportProjectAction.Id = "c5bf2e8b-a549-4508-ab8f-0d626487aeb2"
@@ -42,7 +42,7 @@
         '
         'TransferData
         '
-        Me.TransferData.Caption = "Daten transferieren"
+        Me.TransferData.Caption = "Ordner umbenennen"
         Me.TransferData.Category = "View"
         Me.TransferData.ConfirmationMessage = Nothing
         Me.TransferData.Id = "866a6127-f601-44b9-af7e-f948ec3ec609"

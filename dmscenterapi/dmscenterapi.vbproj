@@ -49,7 +49,7 @@
   <ItemGroup>
     <Reference Include="ApiHelper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\int_dmsv2\ApiHelper\bin\Release\ApiHelper.dll</HintPath>
+      <HintPath>..\..\..\repoapi\intdmsapi\ApiHelper\bin\Debug\ApiHelper.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Data.v18.2, Version=18.2.12.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.Data.18.2.12\lib\net452\DevExpress.Data.v18.2.dll</HintPath>
