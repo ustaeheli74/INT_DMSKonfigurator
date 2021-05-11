@@ -237,7 +237,7 @@ Namespace DMSCenter
 
             Dim groupResponse As GetMembersForGroupResponseModel = _adminApi.GetMembersForGroup(group).Result
          
-            Return groupResponse.Data.GetMembersForGroupMember
+            Return groupResponse.Data.Members
 
         End Function
 
@@ -354,6 +354,9 @@ Namespace DMSCenter
             Dim usr As New SetUserPasswordPostModel
             usr.password = strUserPassword
             usr.profile = strUserName
+            usr.passwordconfirm = strUserPassword
+            
+            
 
             Dim usrResponse As SetUserPasswordResponseModel = _adminApi.SetUserPassword(usr).Result
 
