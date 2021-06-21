@@ -430,10 +430,9 @@ Namespace DMSCenter
                 Next
 
                 For Each dcObj As SorbaUsers In dCollection
-                    DMSCLient.AddGroupMembers(strGroupID, dcObj.MYSUSER.Replace("@", "").Replace(".", ""))
+                    DMSCLient.AddGroupMembers(strGroupID, dcObj.MYSUSER.Replace("@", "").Replace(".", "").ToLower)
                 Next
-
-
+                              
             End If
 
             dCollection.Filter = Nothing
