@@ -334,6 +334,8 @@ Namespace DMSCenter
             usr.disablemyfilessync = 0
             usr.disablenetworksync = 0
             usr.requirepasswordchange = 0
+            usr.verified = 1
+            usr.unlockaccount = "true"
 
 
 
@@ -351,12 +353,12 @@ Namespace DMSCenter
 
         Public Function ChangeUserPW(ByVal strUserName As String, ByVal strUserPassword As String) As SetUserPasswordResponseModel
 
+
             Dim usr As New SetUserPasswordPostModel
             usr.password = strUserPassword
             usr.profile = strUserName
             usr.passwordconfirm = strUserPassword
-            
-            
+
 
             Dim usrResponse As SetUserPasswordResponseModel = _adminApi.SetUserPassword(usr).Result
 
